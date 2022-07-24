@@ -31,3 +31,4 @@ jobs:
           tags: ${{ secrets.DOCKER_USERNAME }}/caddy-cloudflare:latest
           cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/caddy-cloudflare:buildcache
           cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/caddy-cloudflare:buildcache,mode=max
+          platforms: linux/amd64,linux/arm64,linux/arm
