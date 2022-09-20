@@ -1,5 +1,5 @@
-ARG buildertag=builder
 ARG basetag=2.5.2
+ARG buildertag=${basetag}-builder
 
 FROM caddy:${buildertag} AS builder
 
