@@ -14,6 +14,7 @@ latest_new_version=$(lookup_latest_version "$NEW_IMAGE")
 if [ $latest_base_version != $latest_new_version ] ; then
     python3 -m timtools.notify --text "Een nieuwe versie van caddy is beschikbaar ($latest_base_version)"
     cd ~/Programs/docker/caddy-cloudflare
+    git pull
     new_version=$(echo $latest_base_version | sed s/[\",v]//g)
     sed -i "s/basetag=.*/basetag=$new_version/" Dockerfile
     git add Dockerfile
