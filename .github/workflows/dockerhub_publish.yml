@@ -15,7 +15,7 @@ on:
     branches:
       - main
 env:
-    IMAGE_NAME: cloudflare-caddy
+    IMAGE_NAME: caddy-cloudflare
 
 jobs:
   push_dockerhub:
