@@ -39,8 +39,8 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/caddy-cloudflare:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/caddy-cloudflare:buildcache,mode=max
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
           platforms: linux/amd64,linux/arm/v7
           
   push_github:
@@ -62,8 +62,8 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/caddy-cloudflare:latest
+          tags: ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
           builder: ${{ steps.buildx.outputs.name }}
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/caddy-cloudflare:buildcache
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/caddy-cloudflare:buildcache,mode=max
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
           platforms: linux/amd64,linux/arm/v7
