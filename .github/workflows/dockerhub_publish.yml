@@ -25,7 +25,7 @@ jobs:
       - name: Checkout 
         uses: actions/checkout@v2
       - name: Login to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
@@ -41,4 +41,31 @@ jobs:
           tags: ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
           cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/caddy-cloudflare:buildcache
           cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/caddy-cloudflare:buildcache,mode=max
+          platforms: linux/amd64,linux/arm/v7
+          
+  push_github:
+    name: Push Docker image to GitHub Container Registry
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Build:checkout"
+        uses: actions/checkout@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/caddy-cloudflare:latest
+          builder: ${{ steps.buildx.outputs.name }}
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/caddy-cloudflare:buildcache
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/caddy-cloudflare:buildcache,mode=max
           platforms: linux/amd64,linux/arm/v7
