@@ -37,9 +37,7 @@ jobs:
         id: meta
         with:
           images: docker.io/library/caddy:latest
-          tags: |
-            type=raw,value=latest,enable=true
-            type=semver,pattern={{version}}
+          tags: type=semver,pattern={{version}}
       - name: Build and push
         uses: docker/build-push-action@v4
         env:
