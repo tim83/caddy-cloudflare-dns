@@ -40,8 +40,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v4
         env:
-          UPSTREAM_VERSION: ${{needs.check_version.outputs.upstream_version}}
-          MY_VERSION: ${{needs.check_version.outputs.my_version}}
+          UPSTREAM_VERSION: ${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
         with:
           context: .
           push: true
@@ -51,5 +50,5 @@ jobs:
           cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
           platforms: linux/amd64,linux/arm/v7
           build-args: |
-            basetag=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
-            buildertag=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}-builder
+            basetag=${{ env.UPSTREAM_VERSION }}
+            buildertag=${{ env.UPSTREAM_VERSION }}-builder
