@@ -34,7 +34,7 @@ jobs:
         uses: docker/setup-buildx-action@v2
       - name: Get caddy version
         id: caddy_version
-        run:
+        run: |
           version=$(docker run caddy:latest caddy version | tail -n 1 | cut -d " " -f1 | tr -d "v")
           echo "The caddy version is $version"
           if [ -z $version ] ; then echo "FAILED The found caddy version is null" ; exit 5 ; fi
