@@ -39,10 +39,19 @@ jobs:
           echo "The caddy version is $version"
           if [ -z $version ] ; then echo "FAILED The found caddy version is null" ; exit 5 ; fi
           echo "caddy_version=$version" >> $GITHUB_OUTPUT
+      - name: Get my latest version
+        id: my_version
+        run: |
+          version=$(docker run ghcr.io/${{ github.repository_owner }}/${{ env.MY_IMAGE_NAME }}:latest caddy version | tail -n 1 | cut -d " " -f1 | tr -d "v")
+          echo "My version is $version"
+          if [ -z $version ] ; then echo "FAILED The found own version is null" ; exit 5 ; fi
+          echo "my_version=$version" >> $GITHUB_OUTPUT
       - name: Build and push
         uses: docker/build-push-action@v4
         env:
           UPSTREAM_VERSION: ${{ steps.caddy_version.outputs.caddy_version }}
+          MY_VERSION: ${{ steps.my_version.outputs.my_version }}
+        if: ${{ env.UPSTREAM_VERSION }} != ${{ env.MY_VERSION }}
         with:
           context: .
           push: true
