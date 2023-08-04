@@ -51,7 +51,7 @@ jobs:
         env:
           UPSTREAM_VERSION: ${{ steps.caddy_version.outputs.caddy_version }}
           MY_VERSION: ${{ steps.my_version.outputs.my_version }}
-        if: ${{ env.UPSTREAM_VERSION }} != ${{ env.MY_VERSION }}
+        if: ${{ steps.caddy_version.outputs.caddy_version }} != ${{ steps.my_version.outputs.my_version }}
         with:
           context: .
           push: true
