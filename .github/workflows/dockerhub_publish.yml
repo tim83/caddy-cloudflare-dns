@@ -33,7 +33,7 @@ jobs:
           echo "upstream=$version" >> "$GITHUB_OUTPUT"
       - id: check_my
         run: |
-          docker pull ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
+          docker pull ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
           version=$(docker image inspect --format '{{json .}}' ${{ env.IMAGE_NAME }} | jq .RepoTags | grep -E ':[0-9]' | tr -d " \",")
           echo "my=$version" >> "$GITHUB_OUTPUT"
 
@@ -65,4 +65,4 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:buildcache
           cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
           platforms: linux/amd64,linux/arm/v7
-          buildArgs: basetag=${{ env.UPSTREAM_VERSION }},buildertag=${{ env.UPSTREAM_VERSION }}-builder
+          build-args: basetag=${{ env.UPSTREAM_VERSION }},buildertag=${{ env.UPSTREAM_VERSION }}-builder
