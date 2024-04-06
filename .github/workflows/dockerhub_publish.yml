@@ -9,8 +9,6 @@ on:
   pull_request:
     branches:
       - main
-  schedule:
-    - cron: '20 20 * * *'  # 8:20pm everyday
   push:
     branches:
       - main
@@ -32,34 +30,20 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      - name: Get caddy version
-        id: caddy_version
-        run: |
-          version=$(docker run caddy:latest caddy version | tail -n 1 | cut -d " " -f1 | tr -d "v")
-          echo "The caddy version is $version"
-          if [ -z $version ] ; then echo "FAILED The found caddy version is null" ; exit 5 ; fi
-          echo "caddy_version=$version" >> $GITHUB_OUTPUT
-      - name: Get my latest version
-        id: my_version
-        run: |
-          version=$(docker run ghcr.io/${{ github.repository_owner }}/${{ env.MY_IMAGE_NAME }}:latest caddy version | tail -n 1 | cut -d " " -f1 | tr -d "v")
-          echo "My version is $version"
-          if [ -z $version ] ; then echo "FAILED The found own version is null" ; exit 5 ; fi
-          echo "my_version=$version" >> $GITHUB_OUTPUT
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ env.IMAGE_NAME }}
       - name: Build and push
         uses: docker/build-push-action@v4
-        env:
-          UPSTREAM_VERSION: ${{ steps.caddy_version.outputs.caddy_version }}
-          MY_VERSION: ${{ steps.my_version.outputs.my_version }}
         if: ${{ steps.caddy_version.outputs.caddy_version }} != ${{ steps.my_version.outputs.my_version }}
         with:
           context: .
-          push: true
-          tags: ghcr.io/${{ github.repository_owner }}/${{ env.MY_IMAGE_NAME }}:latest,ghcr.io/${{ github.repository_owner }}/${{ env.MY_IMAGE_NAME }}:${{ env.UPSTREAM_VERSION }}
+          push: $ {{ github.event.pull_request.merged == true || github.event.name == 'PushEvent' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           builder: ${{ steps.buildx.outputs.name }}
           cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ env.MY_IMAGE_NAME }}:buildcache
           cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/${{ env.MY_IMAGE_NAME }}:buildcache,mode=max
           platforms: linux/amd64,linux/arm/v7
-          build-args: |
-            basetag=${{ env.UPSTREAM_VERSION }}
-            buildertag=${{ env.UPSTREAM_VERSION }}-builder
