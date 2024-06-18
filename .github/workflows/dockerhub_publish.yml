@@ -36,7 +36,7 @@ jobs:
         with:
           images: ghcr.io/${{ env.IMAGE_NAME }}
       - name: Build and push
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         if: ${{ steps.caddy_version.outputs.caddy_version }} != ${{ steps.my_version.outputs.my_version }}
         with:
           context: .
